@@ -1,0 +1,117 @@
+package tsturm18.pos.todoapp;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Task implements Parcelable {
+
+    public String title;
+    public String dateTime;
+    public String details;
+    public boolean isOver;
+    public boolean isDone = false;
+
+    public Task(String title, String dateTime, String details, boolean isDone) {
+        this.title = title;
+        this.dateTime = dateTime;
+        this.details = details;
+        this.isDone = isDone;
+        setIsOver();
+    }
+
+    public Task(String title, String dateTime, String details) {
+        this.title = title;
+        this.dateTime = dateTime;
+        this.details = details;
+
+        setIsOver();
+    }
+
+    protected Task(Parcel in) {
+        title = in.readString();
+        dateTime = in.readString();
+        details = in.readString();
+        isDone = in.readByte() != 0;
+    }
+
+    public static final Creator<Task> CREATOR = new Creator<Task>() {
+        @Override
+        public Task createFromParcel(Parcel in) {
+            return new Task(in);
+        }
+
+        @Override
+        public Task[] newArray(int size) {
+            return new Task[size];
+        }
+    };
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+    public void setIsOver(){
+        LocalDateTime ldt = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        LocalDateTime ldtDue = LocalDateTime.parse(dateTime, formatter);
+        if (ldtDue.isBefore(ldt)){
+            isOver=true;
+        }
+        else{
+            isOver=false;
+        }
+    }
+
+    public boolean getIsOver(){
+        return isOver;
+    }
+
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public void setDone(boolean done) {
+        isDone = done;
+    }
+
+    @Override
+    public String toString() {
+        return title + ";" + dateTime + ";" + details + ";" + isDone;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(getTitle());
+        dest.writeString(getDateTime());
+        dest.writeString(getDetails());
+        dest.writeBoolean(isDone());
+    }
+}

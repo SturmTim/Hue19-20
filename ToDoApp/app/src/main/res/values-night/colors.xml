@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="defaultColor">#FFFFFFFF</color>
+
+    <color name="over">#711111</color>
+
+    <color name="toolBar">#24314C</color>
+    <color name="textBackground">#36393F</color>
+    <color name="checkBox">#00897B</color>
+</resources>
