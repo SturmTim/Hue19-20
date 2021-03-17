@@ -2,7 +2,6 @@ package tsturm18.pos.todoapp;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +17,8 @@ import java.util.List;
 public class TaskAdapter extends BaseAdapter implements Filterable {
 
     private final int listViewItemLayoutId;
-    private List<Task> tasks;
-    private List<Task> finishedTasks;
+    private final List<Task> tasks;
+    private final List<Task> finishedTasks;
     Context context;
     private final LayoutInflater inflater;
 
@@ -61,7 +60,7 @@ public class TaskAdapter extends BaseAdapter implements Filterable {
             view.setBackgroundColor(context.getColor(R.color.textBackground));
         }
 
-        TextView text = view.findViewById(R.id.titel);
+        TextView text = view.findViewById(R.id.title);
         text.setText(tasks.get(position).getTitle());
 
         TextView dateTime = view.findViewById(R.id.dateTime);

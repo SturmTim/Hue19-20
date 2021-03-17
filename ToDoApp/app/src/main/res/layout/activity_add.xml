@@ -15,15 +15,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Titel"
+            android:text="@string/title"
             android:textSize="18sp" />
 
         <EditText
-            android:id="@+id/editTitel"
+            android:id="@+id/editTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Titel"
+            android:hint="@string/title"
             android:inputType="textPersonName" />
 
     </LinearLayout>
@@ -36,11 +36,11 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ToDo"
-            android:textSize="18dp" />
+            android:text="@string/todo"
+            android:textSize="18sp" />
 
         <EditText
-            android:id="@+id/editTask"
+            android:id="@+id/editDetail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -58,8 +58,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="clickDate"
-            android:text="Date"
-            android:textSize="20dp" />
+            android:text="@string/date"
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/editTime"
@@ -67,8 +67,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="clickTime"
-            android:text="Time"
-            android:textSize="20dp" />
+            android:text="@string/time"
+            android:textSize="20sp" />
 
     </LinearLayout>
 
@@ -84,7 +84,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="add"
-            android:text="Add" />
+            android:text="@string/add"
+            tools:ignore="NestedWeights" />
 
         <Button
             android:id="@+id/cancel"
@@ -92,7 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="cancel"
-            android:text="cancel" />
+            android:text="@string/cancel" />
 
     </LinearLayout>
 

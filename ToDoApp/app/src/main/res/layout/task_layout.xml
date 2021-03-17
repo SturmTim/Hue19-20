@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_centerInParent="false"
@@ -16,28 +15,27 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/titel"
+            android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-
-            android:text="Titel"
-            android:textSize="24dp" />
+            android:text="@string/title"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/dateTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="XX.XX.XXXX XX:XX"
-            android:textSize="16dp" />
+            android:text="@string/xx_xx_xxxx_xx_xx"
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="details" />
+            android:text="@string/details" />
 
     </LinearLayout>
 

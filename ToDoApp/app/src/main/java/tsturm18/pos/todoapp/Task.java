@@ -3,6 +3,8 @@ package tsturm18.pos.todoapp;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -53,36 +55,19 @@ public class Task implements Parcelable {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getDateTime() {
         return dateTime;
-    }
-
-    public void setDateTime(String dateTime) {
-        this.dateTime = dateTime;
     }
 
     public String getDetails() {
         return details;
     }
 
-    public void setDetails(String details) {
-        this.details = details;
-    }
-
     public void setIsOver(){
         LocalDateTime ldt = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         LocalDateTime ldtDue = LocalDateTime.parse(dateTime, formatter);
-        if (ldtDue.isBefore(ldt)){
-            isOver=true;
-        }
-        else{
-            isOver=false;
-        }
+        isOver= ldtDue.isBefore(ldt);
     }
 
     public boolean getIsOver(){
@@ -98,7 +83,7 @@ public class Task implements Parcelable {
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return title + ";" + dateTime + ";" + details + ";" + isDone;
     }
 

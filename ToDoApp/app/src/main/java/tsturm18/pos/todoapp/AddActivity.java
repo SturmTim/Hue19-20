@@ -46,8 +46,8 @@ public class AddActivity extends AppCompatActivity {
     }
 
     public void add(View view){
-        EditText title = findViewById(R.id.editTitel);
-        EditText detail = findViewById(R.id.editTask);
+        EditText title = findViewById(R.id.editTitle);
+        EditText detail = findViewById(R.id.editDetail);
 
         Task task = new Task(title.getText().toString(),editDate.getText().toString() + " " + editTime.getText().toString(),detail.getText().toString());
         Intent intent =new Intent();

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Picker" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="android:windowBackground">@color/textBackground</item>
+        <item name="android:windowNoTitle">true</item>
+        
+        <item name="colorAccent">@color/checkBox</item>
+
+        <item name="colorPrimaryVariant">@color/defaultColor</item>
+        <item name="colorPrimary">@color/defaultColor</item>
+
+        <item name="android:textColorPrimary">@color/defaultColor</item>
+        <item name="android:textColorHint">@color/defaultColor</item>
+
+        <item name="android:textColorSecondary">@color/defaultColor</item>
+
+    </style>
+</resources>

@@ -1,9 +1,9 @@
 package tsturm18.pos.todoapp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         taskAdapter = new TaskAdapter(this,R.layout.task_layout, fullTaskList, finishedTasks);
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        preferencesChangeListener = ( sharedPrefs , key ) -> preferenceChanged(sharedPrefs, key);
+        preferencesChangeListener = this::preferenceChanged;
         pref.registerOnSharedPreferenceChangeListener( preferencesChangeListener );
 
         loadNotes();
@@ -99,8 +99,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void darkMode(boolean darkActivate){
         if (darkActivate){
+            saveNotes();
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }else{
+            saveNotes();
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
     }
@@ -129,14 +131,15 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id){
-            case R.id.saveAction:
+            case R.id.saveTasks:
                 saveNotes();
                 break;
-            case R.id.newNote:
+            case R.id.addTask:
                 addNewNote();
                 break;
             case R.id.settings:
@@ -210,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreateContextMenu(menu, v, menuInfo);
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();

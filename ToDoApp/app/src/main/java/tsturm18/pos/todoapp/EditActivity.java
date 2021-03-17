@@ -25,10 +25,10 @@ public class EditActivity extends AppCompatActivity {
         Intent intent = getIntent();
         originalTask = intent.getParcelableExtra("task");
 
-        title = findViewById(R.id.editTitel);
+        title = findViewById(R.id.editTitle);
         title.setText(originalTask.getTitle());
 
-        detail = findViewById(R.id.editTask);
+        detail = findViewById(R.id.editDetail);
         detail.setText(originalTask.getDetails());
 
         editDate = findViewById(R.id.editDate);
@@ -53,8 +53,7 @@ public class EditActivity extends AppCompatActivity {
 
     public void changeEdit(View view){
 
-        Task task = new Task(title.getText().toString(),editDate.getText().toString() + " " + editTime.getText().toString(),detail.getText().toString());
-        task.setDone(originalTask.isDone());
+        Task task = new Task(title.getText().toString(),editDate.getText().toString() + " " + editTime.getText().toString(),detail.getText().toString(),originalTask.isDone());
         Intent intent =new Intent();
         intent.putExtra("changedTask", task);
 
