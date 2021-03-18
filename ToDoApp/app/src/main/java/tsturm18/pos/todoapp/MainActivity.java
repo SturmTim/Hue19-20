@@ -180,7 +180,12 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         taskView.setAdapter(taskAdapter);
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        saveNotes();
     }
 
     private void preferenceChanged(SharedPreferences sharedPrefs , String key) {
