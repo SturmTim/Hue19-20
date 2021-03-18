@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-public class AddActivity extends AppCompatActivity {
+public class AddTaskActivity extends AppCompatActivity {
 
     Picker picker = new Picker();
     TextView editDate;
@@ -21,7 +21,7 @@ public class AddActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add);
+        setContentView(R.layout.activity_add_task);
 
         editDate = findViewById(R.id.editDate);
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
@@ -33,11 +33,11 @@ public class AddActivity extends AppCompatActivity {
     }
 
     public void clickDate(View view){
-        picker.pickDate(editDate,AddActivity.this);
+        picker.pickDate(editDate, AddTaskActivity.this);
     }
 
     public void clickTime(View view){
-        picker.pickTime(editTime,AddActivity.this);
+        picker.pickTime(editTime, AddTaskActivity.this);
     }
 
     public void cancel(View view){

@@ -3,11 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/saveTasks"
-        android:icon="@android:drawable/ic_menu_save"
-        android:title="@string/item"
-        app:showAsAction="ifRoom" />
-    <item
         android:id="@+id/addTask"
         android:icon="@android:drawable/ic_menu_add"
         android:title="@string/item"

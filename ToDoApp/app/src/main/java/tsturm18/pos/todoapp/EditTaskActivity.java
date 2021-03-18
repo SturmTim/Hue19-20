@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class EditActivity extends AppCompatActivity {
+public class EditTaskActivity extends AppCompatActivity {
 
     Picker picker = new Picker();
     EditText title;
@@ -20,7 +20,7 @@ public class EditActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit);
+        setContentView(R.layout.activity_edit_task);
 
         Intent intent = getIntent();
         originalTask = intent.getParcelableExtra("task");
@@ -39,11 +39,11 @@ public class EditActivity extends AppCompatActivity {
     }
 
     public void clickDate(View view){
-        picker.pickDate(editDate,EditActivity.this);
+        picker.pickDate(editDate, EditTaskActivity.this);
     }
 
     public void clickTime(View view){
-        picker.pickTime(editTime,EditActivity.this);
+        picker.pickTime(editTime, EditTaskActivity.this);
     }
 
     public void cancel(View view){
