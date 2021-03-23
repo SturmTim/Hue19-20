@@ -33,9 +33,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -93,6 +91,24 @@ public class MainActivity extends AppCompatActivity {
         registerForContextMenu(taskView);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveNotes();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        saveNotes();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        saveNotes();
+    }
+
     private static final int RQ_WRITE_STORAGE = 12345;
     private static final int RQ_READ_STORAGE = 54321;
 
@@ -114,18 +130,10 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode==RQ_WRITE_STORAGE) {
-            if (grantResults.length>0 && grantResults[0]!=PackageManager.PERMISSION_GRANTED) {
-                allowedToWrite = false;
-            } else {
-                allowedToWrite = true;
-            }
+            allowedToWrite = grantResults.length <= 0 || grantResults[0] == PackageManager.PERMISSION_GRANTED;
         }
         if (requestCode==RQ_READ_STORAGE) {
-            if ( grantResults.length>0 && grantResults[0]!=PackageManager.PERMISSION_GRANTED) {
-                allowedToRead = false;
-            } else {
-                allowedToRead = true;
-            }
+            allowedToRead = grantResults.length <= 0 || grantResults[0] == PackageManager.PERMISSION_GRANTED;
         }
     }
 
@@ -182,11 +190,7 @@ public class MainActivity extends AppCompatActivity {
         taskView.setAdapter(taskAdapter);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        saveNotes();
-    }
+
 
     private void preferenceChanged(SharedPreferences sharedPrefs , String key) {
         if (key.equals("hideDone")){
@@ -208,10 +212,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void darkMode(boolean darkActivate){
-        saveNotes();
         if (darkActivate){
+
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }else{
+
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
     }
@@ -287,11 +292,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 fullTaskList.add(task);
                 taskView.invalidateViews();
-                saveNotes();
             }
         });
         undoBar.show();
-        saveNotes();
     }
 
     public void editItem(int position){
@@ -304,7 +307,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == ADD_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Task task = data.getParcelableExtra("addedTask");
@@ -319,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
                 fullTaskList.set(changedPosition,task);
             }
         }
-        saveNotes();
+
         taskView.invalidateViews();
     }
 }
