@@ -1,4 +1,4 @@
-package tsturm18.pos.todoapp;
+package tsturm18.pos.todoapp.taskList;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -41,16 +41,22 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import tsturm18.pos.todoapp.R;
+import tsturm18.pos.todoapp.SettingActivity;
+import tsturm18.pos.todoapp.task.AddTaskActivity;
+import tsturm18.pos.todoapp.task.EditTaskActivity;
+import tsturm18.pos.todoapp.task.Task;
+
 public class MainActivity extends AppCompatActivity {
-    List<Task> fullTaskList = new ArrayList<>();
-    List<Task> finishedTasks = new ArrayList<>();
+
+    List<TaskList> taskList = new ArrayList<>();
+
+    private ListView taskListView;
+
+    private ListAdapter listAdapter;
 
     private static boolean allowedToWrite = false;
     private static boolean allowedToRead = false;
-
-    private ListView taskView;
-
-    private TaskAdapter taskAdapter;
 
     private static final int ADD_ACTIVITY_REQUEST_CODE = 0;
     private final static int SETTING_PREFERENCE = 1;
@@ -75,9 +81,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        taskView = findViewById(R.id.taskList);
+        taskListView = findViewById(R.id.taskList);
 
-        taskAdapter = new TaskAdapter(this,R.layout.task_layout, fullTaskList, finishedTasks);
+        listAdapter = new ListAdapter(this,R.layout.list_layout, taskList);
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         preferencesChangeListener = this::preferenceChanged;
@@ -85,10 +91,9 @@ public class MainActivity extends AppCompatActivity {
 
         loadNotes();
 
-        show(pref.getBoolean("hideDone",false));
         darkMode(pref.getBoolean("darkActivate",false));
 
-        registerForContextMenu(taskView);
+        registerForContextMenu(taskListView);
     }
 
     @Override
@@ -153,11 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
             Gson gson = new Gson();
 
-            List<Task> allTasks = new ArrayList<>();
-            allTasks.addAll(fullTaskList);
-            allTasks.addAll(finishedTasks);
-
-            String json =  gson.toJson(allTasks);
+            String json =  gson.toJson(taskList);
             outPrintWriter.println(json);
             outPrintWriter.flush();
             outPrintWriter.close();
@@ -176,47 +177,34 @@ public class MainActivity extends AppCompatActivity {
                 file = new File("notes.json");
             }
             FileInputStream fileInputStream = new FileInputStream(file);
-            fullTaskList.clear();
+            taskList.clear();
             try(BufferedReader bufferedInputStream = new BufferedReader(new InputStreamReader(fileInputStream))){
                 String s = bufferedInputStream.readLine();
                 Gson gson = new Gson();
-                fullTaskList.addAll(gson.fromJson(s,new TypeToken<List<Task>>(){}.getType()));
+                taskList.addAll(gson.fromJson(s,new TypeToken<List<TaskList>>(){}.getType()));
             }catch(IOException e){
                 e.printStackTrace();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        taskView.setAdapter(taskAdapter);
+        taskListView.setAdapter(listAdapter);
     }
 
 
 
     private void preferenceChanged(SharedPreferences sharedPrefs , String key) {
-        if (key.equals("hideDone")){
-            boolean hideFinished = sharedPrefs.getBoolean(key, false);
-            show(hideFinished);
-        }else if(key.equals("darkActivate")){
+        if(key.equals("darkActivate")){
             boolean darkActivate = sharedPrefs.getBoolean(key,false);
             darkMode(darkActivate);
         }
 
     }
 
-    public void show(boolean hideFinished){
-        if (hideFinished){
-            taskAdapter.getFilter().filter("hide");
-        }else{
-            taskAdapter.getFilter().filter("show");
-        }
-    }
-
     public void darkMode(boolean darkActivate){
         if (darkActivate){
-
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }else{
-
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
     }
@@ -235,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id){
             case R.id.addTask:
-                addNewNote();
+                addNewList();
                 break;
             case R.id.settings:
                 useSettings();
@@ -245,8 +233,8 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void addNewNote(){
-        Intent intent = new Intent(this, AddTaskActivity.class);
+    private void addNewList(){
+        Intent intent = new Intent(this, AddListActivity.class);
         startActivityForResult(intent, ADD_ACTIVITY_REQUEST_CODE);
     }
 
@@ -283,15 +271,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void deleteItem(int position){
-        Task task = fullTaskList.remove(position);
-        taskView.invalidateViews();
+        TaskList list = taskList.remove(position);
+        taskListView.invalidateViews();
 
-        Snackbar undoBar = Snackbar.make(findViewById(R.id.layout),task.getTitle() + " was deleted",30000);
+        Snackbar undoBar = Snackbar.make(findViewById(R.id.layout),list.getName() + " was deleted",30000);
         undoBar.setAction("Undo", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fullTaskList.add(task);
-                taskView.invalidateViews();
+                taskList.add(list);
+                taskListView.invalidateViews();
             }
         });
         undoBar.show();
@@ -299,8 +287,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void editItem(int position){
         changedPosition=position;
-        Intent intent = new Intent(this, EditTaskActivity.class);
-        intent.putExtra("task",fullTaskList.get(position));
+        Intent intent = new Intent(this, EditListActivity.class);
+        intent.putExtra("taskList",taskList.get(position));
         startActivityForResult(intent, Edit_ACTIVITY_REQUEST_CODE);
     }
 
@@ -309,19 +297,23 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ADD_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                Task task = data.getParcelableExtra("addedTask");
-                task.setIsOver();
-                fullTaskList.add(task);
+                TaskList list = data.getParcelableExtra("addedList");
+                taskList.add(list);
             }
         }
         else if (requestCode == Edit_ACTIVITY_REQUEST_CODE){
             if (resultCode == RESULT_OK){
-                Task task = data.getParcelableExtra(("changedTask"));
-                task.setIsOver();
-                fullTaskList.set(changedPosition,task);
+                TaskList list = data.getParcelableExtra(("changedTaskList"));
+                taskList.set(changedPosition,list);
+            }
+        }
+        else if (requestCode == listAdapter.OPEN_TASK_LIST){
+            if (resultCode == RESULT_OK){
+                TaskList task = data.getParcelableExtra("tasks");
+                taskList.set(listAdapter.lastClickedList,task);
             }
         }
 
-        taskView.invalidateViews();
+        taskListView.invalidateViews();
     }
 }

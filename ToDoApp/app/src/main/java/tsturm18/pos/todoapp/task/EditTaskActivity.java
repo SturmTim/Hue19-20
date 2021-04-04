@@ -1,4 +1,4 @@
-package tsturm18.pos.todoapp;
+package tsturm18.pos.todoapp.task;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import tsturm18.pos.todoapp.Picker;
+import tsturm18.pos.todoapp.R;
 
 public class EditTaskActivity extends AppCompatActivity {
 

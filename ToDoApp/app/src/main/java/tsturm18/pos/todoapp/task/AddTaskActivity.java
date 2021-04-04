@@ -1,4 +1,4 @@
-package tsturm18.pos.todoapp;
+package tsturm18.pos.todoapp.task;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,6 +11,9 @@ import android.widget.TextView;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+
+import tsturm18.pos.todoapp.Picker;
+import tsturm18.pos.todoapp.R;
 
 public class AddTaskActivity extends AppCompatActivity {
 

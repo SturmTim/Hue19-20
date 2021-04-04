@@ -1,4 +1,4 @@
-package tsturm18.pos.todoapp;
+package tsturm18.pos.todoapp.task;
 
 import android.os.Parcel;
 import android.os.Parcelable;

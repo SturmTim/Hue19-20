@@ -1,7 +1,8 @@
-package tsturm18.pos.todoapp;
+package tsturm18.pos.todoapp.task;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import tsturm18.pos.todoapp.R;
 
 public class TaskAdapter extends BaseAdapter implements Filterable {
 
@@ -32,6 +35,8 @@ public class TaskAdapter extends BaseAdapter implements Filterable {
 
         this.context = context;
         inflater =(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+
     }
 
     @Override
@@ -82,7 +87,6 @@ public class TaskAdapter extends BaseAdapter implements Filterable {
                         finishedTasks.add(tasks.remove(position));
                         notifyDataSetChanged();
                     }
-
                 }
             }
         });

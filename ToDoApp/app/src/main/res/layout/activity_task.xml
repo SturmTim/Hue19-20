@@ -16,6 +16,14 @@
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme" />
 
+    <TextView
+        android:id="@+id/listName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="TextView"
+        android:textSize="28sp" />
+
     <ListView
         android:id="@+id/taskList"
         android:layout_width="match_parent"

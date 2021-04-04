@@ -2,9 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="tsturm18.pos.todoapp">
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -13,10 +15,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ToDoApp">
-        <activity android:name=".EditTaskActivity" />
+        <activity android:name=".task.TaskActivity"></activity>
+        <activity android:name=".taskList.EditListActivity" />
+        <activity android:name=".taskList.AddListActivity" />
+        <activity android:name=".task.EditTaskActivity" />
         <activity android:name=".SettingActivity" />
-        <activity android:name=".AddTaskActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".task.AddTaskActivity" />
+        <activity android:name=".taskList.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
