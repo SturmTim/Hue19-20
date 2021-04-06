@@ -34,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -79,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         taskListView = findViewById(R.id.taskList);
 
@@ -170,13 +170,15 @@ public class MainActivity extends AppCompatActivity {
     private void loadNotes(){
         File file;
         try {
+            FileInputStream fileInputStream;
             if(allowedToRead && allowedToWrite){
                 String folder =  getExternalFilesDir(null).getAbsolutePath();
                 file = new File(folder + File.separator + "notes.json");
+                fileInputStream = new FileInputStream(file);
             }else{
                 file = new File("notes.json");
+                fileInputStream = openFileInput(file.getName());
             }
-            FileInputStream fileInputStream = new FileInputStream(file);
             taskList.clear();
             try(BufferedReader bufferedInputStream = new BufferedReader(new InputStreamReader(fileInputStream))){
                 String s = bufferedInputStream.readLine();
