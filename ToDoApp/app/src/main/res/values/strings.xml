@@ -26,4 +26,8 @@
     <string name="delete">Delete</string>
     <string name="xx_xx_xxxx_xx_xx">XX.XX.XXXX XX:XX</string>
     <string name="details">details</string>
+    <string name="login">logIn</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="sign_up">Sign up</string>
 </resources>

@@ -1,14 +1,13 @@
 package tsturm18.pos.todoapp.taskList;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import tsturm18.pos.todoapp.R;
-import tsturm18.pos.todoapp.task.Task;
 
 public class EditListActivity extends AppCompatActivity {
 

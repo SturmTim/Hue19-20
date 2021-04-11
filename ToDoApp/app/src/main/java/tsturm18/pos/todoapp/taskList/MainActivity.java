@@ -34,7 +34,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -42,11 +41,10 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import tsturm18.pos.todoapp.LogIn_SignUp;
 import tsturm18.pos.todoapp.R;
 import tsturm18.pos.todoapp.SettingActivity;
-import tsturm18.pos.todoapp.task.AddTaskActivity;
-import tsturm18.pos.todoapp.task.EditTaskActivity;
-import tsturm18.pos.todoapp.task.Task;
+import tsturm18.pos.todoapp.User;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,19 +58,21 @@ public class MainActivity extends AppCompatActivity {
     private static boolean allowedToRead = false;
 
     private static final int ADD_ACTIVITY_REQUEST_CODE = 0;
-    private final static int SETTING_PREFERENCE = 1;
+    private static final int SETTING_PREFERENCE = 1;
     private static final int Edit_ACTIVITY_REQUEST_CODE = 2;
+    private static final int LOGIN_REGISTER = 3;
 
     private SharedPreferences pref;
     private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangeListener;
 
     int changedPosition;
 
+    User currentUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
             checkPermissions();
@@ -88,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         preferencesChangeListener = this::preferenceChanged;
         pref.registerOnSharedPreferenceChangeListener( preferencesChangeListener );
+
+        currentUser = new User(pref.getString("username", ""),pref.getString("password",""));
 
         loadNotes();
 
@@ -193,8 +195,6 @@ public class MainActivity extends AppCompatActivity {
         taskListView.setAdapter(listAdapter);
     }
 
-
-
     private void preferenceChanged(SharedPreferences sharedPrefs , String key) {
         if(key.equals("darkActivate")){
             boolean darkActivate = sharedPrefs.getBoolean(key,false);
@@ -230,6 +230,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.settings:
                 useSettings();
                 break;
+            case  R.id.account:
+                logIn();
+                break;
 
         }
         return super.onOptionsItemSelected(item);
@@ -244,6 +247,12 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this,
                 SettingActivity.class);
         startActivityForResult(intent,SETTING_PREFERENCE);
+    }
+
+    private void logIn(){
+        Intent intent = new Intent(this, LogIn_SignUp.class);
+        intent.putExtra("currentUser",currentUser);
+        startActivityForResult(intent,LOGIN_REGISTER);
     }
 
     int viewId;
@@ -313,6 +322,13 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK){
                 TaskList task = data.getParcelableExtra("tasks");
                 taskList.set(listAdapter.lastClickedList,task);
+            }
+        }
+        else if (requestCode == LOGIN_REGISTER){
+            if (resultCode == RESULT_OK){
+                currentUser = data.getParcelableExtra("user");
+                pref.edit().putString("username",currentUser.getUsername()).apply();
+                pref.edit().putString("password",currentUser.getPassword()).apply();
             }
         }
 
