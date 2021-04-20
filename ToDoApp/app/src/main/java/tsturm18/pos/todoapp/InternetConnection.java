@@ -8,6 +8,8 @@ import android.net.NetworkInfo;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 
 public class InternetConnection {
@@ -134,34 +136,23 @@ public class InternetConnection {
     public Response get(String urlString){
         final Response[] responses = new Response[1];
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try  {
-                    URL url = new URL(urlString);
-                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                    httpURLConnection.setRequestMethod("GET");
-                    httpURLConnection.setRequestProperty("Content-Type","application/json");
-
-                    int responseCode = httpURLConnection.getResponseCode();
-                    if(responseCode/100==4||responseCode/100==5){
-                        responses[0] = new Response(httpURLConnection.getErrorStream(), responseCode);
-                    }else {
-                        responses[0] = new Response(httpURLConnection.getInputStream(), responseCode);
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-        });
-        thread.start();
         try {
-            thread.join();
-        } catch (InterruptedException e) {
+            URL url = new URL(urlString);
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            httpURLConnection.setRequestMethod("GET");
+            httpURLConnection.setRequestProperty("Content-Type","application/json");
+
+            int responseCode = httpURLConnection.getResponseCode();
+            if(responseCode/100==4||responseCode/100==5){
+                responses[0] = new Response(httpURLConnection.getErrorStream(), responseCode);
+            }else {
+                responses[0] = new Response(httpURLConnection.getInputStream(), responseCode);
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
+
+
         return responses[0];
     }
 
@@ -172,6 +163,10 @@ public class InternetConnection {
         public Response(InputStream inputStream, int responseCode) {
             this.inputStream = inputStream;
             this.responseCode = responseCode;
+        }
+
+        public InputStream getInputStream() {
+            return inputStream;
         }
 
         public boolean startWith(int code){

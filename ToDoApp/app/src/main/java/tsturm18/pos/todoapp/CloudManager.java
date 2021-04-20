@@ -1,7 +1,5 @@
 package tsturm18.pos.todoapp;
 
-import android.accounts.Account;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -86,13 +84,10 @@ public class CloudManager {
                     DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
                     dateTime = localDateTime.format(myFormat);
                     boolean done;
-                    if (jsonObject.get("state").getAsString().equals("OPEN")){
-                        done = false;
-                    } else {
-                        done = true;
-                    }
+                    done = !jsonObject.get("state").getAsString().equals("OPEN");
                     Task task = new Task(title,dateTime,details,done);
                     task.setTaskId(id);
+                    task.setLocation(jsonObject.get("additionalData").getAsString());
                     int listId = jsonObject.get("todoListId").getAsInt();
                     for (TaskList taskList:taskLists) {
                         if (taskList.getListId() == listId){
@@ -109,7 +104,7 @@ public class CloudManager {
         return taskLists;
     }
 
-    public boolean addList(TaskList taskList){
+    public void addList(TaskList taskList){
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("name",taskList.getName());
@@ -123,40 +118,31 @@ public class CloudManager {
                 lastChangedList = taskList;
             }
             response.close();
-            return success;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
-    public boolean editList(TaskList taskList){
+    public void editList(TaskList taskList){
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("name",taskList.getName());
             jsonObject.put("additionalData","");
             InternetConnection.Response response = internetConnection.put("http://sickinger-solutions.at/notesserver/todolists.php?id=" + taskList.getListId() + "&username=" + user.getUsername() +"&password=" + user.getPassword(),jsonObject.toString());
-            boolean success = response.startWith(2);
 
             response.close();
 
-            return success;
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
-    public boolean deleteList(TaskList taskList){
+    public void deleteList(TaskList taskList){
         InternetConnection.Response response = internetConnection.delete("http://sickinger-solutions.at/notesserver/todolists.php?id=" + taskList.getListId() +"&username="+ user.getUsername() +"&password=" + user.getPassword());
-        boolean success = response.startWith(2);
         response.close();
-        return success;
     }
 
-    public boolean addTask(TaskList taskList, Task task){
+    public void addTask(TaskList taskList, Task task){
 
         JSONObject jsonObject = new JSONObject();
         try {
@@ -169,7 +155,7 @@ public class CloudManager {
             }else {
                 jsonObject.put("state","OPEN");
             }
-            jsonObject.put("additionalData","_");
+            jsonObject.put("additionalData",task.getLocation() + " ");
 
             InternetConnection.Response response = internetConnection.post("http://sickinger-solutions.at/notesserver/todo.php?username="+ user.getUsername() +"&password=" + user.getPassword(),jsonObject.toString());
             boolean success = response.startWith(2);
@@ -180,16 +166,12 @@ public class CloudManager {
                 lastChangedTask = task;
             }
             response.close();
-            return success;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
-    public boolean editTask(TaskList taskList, Task task){
+    public void editTask(TaskList taskList, Task task){
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("todoListId",taskList.getListId());
@@ -201,22 +183,17 @@ public class CloudManager {
             }else {
                 jsonObject.put("state","OPEN");
             }
-            jsonObject.put("additionalData","_");
+            jsonObject.put("additionalData",task.getLocation());
 
             InternetConnection.Response response = internetConnection.put("http://sickinger-solutions.at/notesserver/todo.php?id=" + task.getTaskId() +"&username=" + user.getUsername() + "&password=" + user.getPassword(),jsonObject.toString());
-            boolean success = response.startWith(2);
             response.close();
-            return success;
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
-    public boolean deleteTask(Task task){
+    public void deleteTask(Task task){
         InternetConnection.Response response = internetConnection.delete("http://sickinger-solutions.at/notesserver/todo.php?id=" + task.getTaskId() + "&username=" + user.getUsername() + "&password=" + user.getPassword());
-        boolean success = response.startWith(2);
         response.close();
-        return success;
     }
 }

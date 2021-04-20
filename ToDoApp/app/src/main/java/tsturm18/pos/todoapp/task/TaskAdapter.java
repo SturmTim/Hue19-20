@@ -106,6 +106,9 @@ public class TaskAdapter extends BaseAdapter implements Filterable {
             }
         });
 
+        TextView location = view.findViewById(R.id.location);
+        location.setText(tasks.get(position).getLocation());
+
         return view;
     }
 
