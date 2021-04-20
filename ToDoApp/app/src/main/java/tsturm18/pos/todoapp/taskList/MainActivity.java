@@ -2,6 +2,7 @@ package tsturm18.pos.todoapp.taskList;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,12 +15,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -38,9 +43,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
 
+import tsturm18.pos.todoapp.CloudManager;
+import tsturm18.pos.todoapp.InternetConnection;
 import tsturm18.pos.todoapp.LogIn_SignUp;
 import tsturm18.pos.todoapp.R;
 import tsturm18.pos.todoapp.SettingActivity;
@@ -54,9 +62,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ListAdapter listAdapter;
 
-    private static boolean allowedToWrite = false;
-    private static boolean allowedToRead = false;
-
     private static final int ADD_ACTIVITY_REQUEST_CODE = 0;
     private static final int SETTING_PREFERENCE = 1;
     private static final int Edit_ACTIVITY_REQUEST_CODE = 2;
@@ -68,15 +73,14 @@ public class MainActivity extends AppCompatActivity {
     int changedPosition;
 
     User currentUser;
+    CloudManager cloudManager;
+    InternetConnection internetConnection = new InternetConnection();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-            checkPermissions();
-        }
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -90,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         pref.registerOnSharedPreferenceChangeListener( preferencesChangeListener );
 
         currentUser = new User(pref.getString("username", ""),pref.getString("password",""));
+        cloudManager = new CloudManager(currentUser);
 
         loadNotes();
 
@@ -116,47 +121,13 @@ public class MainActivity extends AppCompatActivity {
         saveNotes();
     }
 
-    private static final int RQ_WRITE_STORAGE = 12345;
-    private static final int RQ_READ_STORAGE = 54321;
-
-    private void checkPermissions(){
-        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, RQ_WRITE_STORAGE);
-        } else {
-            allowedToWrite = true;
-        }
-        if (checkSelfPermission (Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, RQ_READ_STORAGE);
-        } else {
-            allowedToRead = true;
-        }
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode==RQ_WRITE_STORAGE) {
-            allowedToWrite = grantResults.length <= 0 || grantResults[0] == PackageManager.PERMISSION_GRANTED;
-        }
-        if (requestCode==RQ_READ_STORAGE) {
-            allowedToRead = grantResults.length <= 0 || grantResults[0] == PackageManager.PERMISSION_GRANTED;
-        }
-    }
-
     public void saveNotes(){
         File file;
         try {
             PrintWriter outPrintWriter;
-            if(allowedToRead && allowedToWrite){
-                String folder =  getExternalFilesDir(null).getAbsolutePath();
-                file = new File(folder + File.separator + "notes.json");
-                outPrintWriter= new PrintWriter(new OutputStreamWriter(new FileOutputStream(file)));
-            }else{
-                file = new File("notes.json");
-                OutputStream outputStream = openFileOutput(file.getName(), Context.MODE_PRIVATE);
-                outPrintWriter = new PrintWriter(new OutputStreamWriter(outputStream));
-            }
+            file = new File("notes.json");
+            OutputStream outputStream = openFileOutput(file.getName(), Context.MODE_PRIVATE);
+            outPrintWriter = new PrintWriter(new OutputStreamWriter(outputStream));
 
             Gson gson = new Gson();
 
@@ -172,22 +143,22 @@ public class MainActivity extends AppCompatActivity {
     private void loadNotes(){
         File file;
         try {
-            FileInputStream fileInputStream;
-            if(allowedToRead && allowedToWrite){
-                String folder =  getExternalFilesDir(null).getAbsolutePath();
-                file = new File(folder + File.separator + "notes.json");
-                fileInputStream = new FileInputStream(file);
-            }else{
+            if (currentUser.validUsername() && internetConnection.isNetworkAvailable(this)){
+                taskList.clear();
+                taskList.addAll(cloudManager.loadFromCloud());
+            }else {
+                FileInputStream fileInputStream;
                 file = new File("notes.json");
                 fileInputStream = openFileInput(file.getName());
-            }
-            taskList.clear();
-            try(BufferedReader bufferedInputStream = new BufferedReader(new InputStreamReader(fileInputStream))){
-                String s = bufferedInputStream.readLine();
-                Gson gson = new Gson();
-                taskList.addAll(gson.fromJson(s,new TypeToken<List<TaskList>>(){}.getType()));
-            }catch(IOException e){
-                e.printStackTrace();
+
+                taskList.clear();
+                try(BufferedReader bufferedInputStream = new BufferedReader(new InputStreamReader(fileInputStream))){
+                    String s = bufferedInputStream.readLine();
+                    Gson gson = new Gson();
+                    taskList.addAll(gson.fromJson(s,new TypeToken<List<TaskList>>(){}.getType()));
+                }catch(IOException e){
+                    e.printStackTrace();
+                }
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -250,9 +221,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void logIn(){
-        Intent intent = new Intent(this, LogIn_SignUp.class);
-        intent.putExtra("currentUser",currentUser);
-        startActivityForResult(intent,LOGIN_REGISTER);
+        if (new InternetConnection().isNetworkAvailable(this)){
+            Intent intent = new Intent(this, LogIn_SignUp.class);
+            intent.putExtra("currentUser",currentUser);
+            startActivityForResult(intent,LOGIN_REGISTER);
+        }else {
+            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     int viewId;
@@ -283,6 +259,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void deleteItem(int position){
         TaskList list = taskList.remove(position);
+        if (currentUser.validUsername() && internetConnection.isNetworkAvailable(this)){
+            cloudManager.deleteList(list);
+        }
         taskListView.invalidateViews();
 
         Snackbar undoBar = Snackbar.make(findViewById(R.id.layout),list.getName() + " was deleted",30000);
@@ -290,6 +269,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 taskList.add(list);
+                if (currentUser.validUsername() && internetConnection.isNetworkAvailable(MainActivity.this)){
+                    cloudManager.addList(list);
+                }
                 taskListView.invalidateViews();
             }
         });
@@ -309,12 +291,19 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == ADD_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 TaskList list = data.getParcelableExtra("addedList");
+                if (currentUser.validUsername() && internetConnection.isNetworkAvailable(this)){
+                    cloudManager.addList(list);
+                    list = cloudManager.getLastChangedList();
+                }
                 taskList.add(list);
             }
         }
         else if (requestCode == Edit_ACTIVITY_REQUEST_CODE){
             if (resultCode == RESULT_OK){
                 TaskList list = data.getParcelableExtra(("changedTaskList"));
+                if (currentUser.validUsername() && internetConnection.isNetworkAvailable(this)){
+                    cloudManager.editList(list);
+                }
                 taskList.set(changedPosition,list);
             }
         }
@@ -329,6 +318,8 @@ public class MainActivity extends AppCompatActivity {
                 currentUser = data.getParcelableExtra("user");
                 pref.edit().putString("username",currentUser.getUsername()).apply();
                 pref.edit().putString("password",currentUser.getPassword()).apply();
+                cloudManager = new CloudManager(currentUser);
+                loadNotes();
             }
         }
 

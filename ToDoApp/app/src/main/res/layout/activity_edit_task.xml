@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="10sp"
+    android:layout_marginTop="30sp"
     android:orientation="vertical"
     tools:context=".task.EditTaskActivity">
 
@@ -84,6 +86,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="changeEdit"
+            android:paddingVertical="15sp"
             android:text="@string/save" />
 
         <Button
@@ -92,6 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="cancel"
+            android:paddingVertical="15sp"
             android:text="@string/cancel" />
 
     </LinearLayout>

@@ -67,7 +67,7 @@ public class LogIn_SignUp extends AppCompatActivity {
             intent.putExtra("user",user);
             setResult(RESULT_OK,intent);
         }else{
-            Toast.makeText(this, "Unable to logIn", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Incorrect username or password", Toast.LENGTH_SHORT).show();
         }
         finish();
     }
@@ -76,7 +76,7 @@ public class LogIn_SignUp extends AppCompatActivity {
         User user = new User(username.getText().toString(),password.getText().toString());
         if (user.validPassword() && user.validUsername()){
             if (!user.signUp()){
-                Toast.makeText(this, "Unable to register", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Username already exists", Toast.LENGTH_SHORT).show();
             }
         }else{
             Toast.makeText(this, "Not a valid Password or Username", Toast.LENGTH_SHORT).show();

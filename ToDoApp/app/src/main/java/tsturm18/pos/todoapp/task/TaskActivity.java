@@ -26,8 +26,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import tsturm18.pos.todoapp.CloudManager;
+import tsturm18.pos.todoapp.InternetConnection;
 import tsturm18.pos.todoapp.R;
 import tsturm18.pos.todoapp.SettingActivity;
+import tsturm18.pos.todoapp.User;
 import tsturm18.pos.todoapp.taskList.TaskList;
 
 public class TaskActivity extends AppCompatActivity {
@@ -49,6 +52,9 @@ public class TaskActivity extends AppCompatActivity {
 
     int changedPosition;
 
+    User currentUser;
+    CloudManager cloudManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,10 +69,7 @@ public class TaskActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
         taskView = findViewById(R.id.taskList);
-
-        taskAdapter = new TaskAdapter(this,R.layout.task_layout, fullTaskList, finishedTasks);
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         preferencesChangeListener = this::preferenceChanged;
@@ -76,10 +79,17 @@ public class TaskActivity extends AppCompatActivity {
         for (int i = 0; i < fullTaskList.size(); i++){
             fullTaskList.get(i).setIsOver();
         }
+        currentUser = new User(pref.getString("username", ""),pref.getString("password",""));
+        cloudManager = new CloudManager(currentUser);
+
+        taskAdapter = new TaskAdapter(this,R.layout.task_layout, fullTaskList, finishedTasks,cloudManager,taskList);
+
         taskView.setAdapter(taskAdapter);
 
         show(pref.getBoolean("hideDone",false));
         darkMode(pref.getBoolean("darkActivate",false));
+
+
 
         registerForContextMenu(taskView);
     }
@@ -182,12 +192,17 @@ public class TaskActivity extends AppCompatActivity {
     public void deleteItem(int position){
         Task task = fullTaskList.remove(position);
         taskView.invalidateViews();
-
+        if (currentUser.validUsername() && new InternetConnection().isNetworkAvailable(this)){
+            cloudManager.deleteTask(task);
+        }
         Snackbar undoBar = Snackbar.make(findViewById(R.id.layout),task.getTitle() + " was deleted",30000);
         undoBar.setAction("Undo", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 fullTaskList.add(task);
+                if (currentUser.validUsername() && new InternetConnection().isNetworkAvailable(TaskActivity.this)){
+                    cloudManager.addTask(taskList,task);
+                }
                 returnResult();
                 taskView.invalidateViews();
             }
@@ -210,6 +225,10 @@ public class TaskActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 Task task = data.getParcelableExtra("addedTask");
                 task.setIsOver();
+                if (currentUser.validUsername() && new InternetConnection().isNetworkAvailable(this)){
+                    cloudManager.addTask(taskList,task);
+                    task = cloudManager.getLastChangedTask();
+                }
                 fullTaskList.add(task);
             }
         }
@@ -217,6 +236,9 @@ public class TaskActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK){
                 Task task = data.getParcelableExtra(("changedTask"));
                 task.setIsOver();
+                if (currentUser.validUsername() && new InternetConnection().isNetworkAvailable(this)){
+                    cloudManager.editTask(taskList,task);
+                }
                 fullTaskList.set(changedPosition,task);
             }
         }

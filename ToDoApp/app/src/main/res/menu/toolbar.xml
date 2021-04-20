@@ -4,17 +4,17 @@
 
     <item
         android:id="@+id/addTask"
-        android:icon="@android:drawable/ic_menu_add"
+        android:icon="@drawable/ic_baseline_add_24"
         android:title="@string/item"
         app:showAsAction="always" />
     <item
         android:id="@+id/settings"
-        android:icon="@android:drawable/ic_menu_manage"
+        android:icon="@drawable/ic_baseline_settings_24"
         android:title="@string/item"
         app:showAsAction="always" />
     <item
         android:id="@+id/account"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/ic_baseline_account_circle_24"
         android:title="@string/item"
         app:showAsAction="always" />
 </menu>

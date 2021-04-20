@@ -3,7 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="10sp"
+    android:layout_marginTop="30sp"
     android:orientation="vertical"
+    android:paddingVertical="15sp"
     tools:context=".taskList.AddListActivity">
 
     <LinearLayout
@@ -40,6 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="add"
+            android:paddingVertical="15sp"
             android:text="@string/add" />
 
         <Button
@@ -48,6 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="cancel"
+            android:paddingVertical="15sp"
             android:text="@string/cancel" />
 
     </LinearLayout>

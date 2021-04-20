@@ -34,6 +34,7 @@ public class EditListActivity extends AppCompatActivity {
 
     public void changeEdit(View view){
         TaskList taskList = new TaskList(title.getText().toString(),originalTaskList.getTasks());
+        taskList.setListId(originalTaskList.getListId());
         Intent intent =new Intent();
         intent.putExtra("changedTaskList", taskList);
 

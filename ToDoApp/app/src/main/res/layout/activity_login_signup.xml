@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
+    android:layout_marginHorizontal="10sp"
+    android:layout_marginTop="30sp"
     android:orientation="vertical"
     tools:context=".LogIn_SignUp">
 
@@ -39,8 +40,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/login"
-            android:onClick="logIn"/>
+            android:onClick="logIn"
+            android:paddingVertical="15sp"
+            android:text="@string/login" />
 
         <Button
             android:id="@+id/signUp"
@@ -48,6 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="signUp"
+            android:paddingVertical="15sp"
             android:text="@string/sign_up" />
     </LinearLayout>
 

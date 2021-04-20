@@ -57,6 +57,7 @@ public class EditTaskActivity extends AppCompatActivity {
     public void changeEdit(View view){
 
         Task task = new Task(title.getText().toString(),editDate.getText().toString() + " " + editTime.getText().toString(),detail.getText().toString(),originalTask.isDone());
+        task.setTaskId(originalTask.getTaskId());
         Intent intent =new Intent();
         intent.putExtra("changedTask", task);
 

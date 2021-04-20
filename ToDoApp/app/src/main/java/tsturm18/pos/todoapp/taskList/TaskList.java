@@ -13,6 +13,8 @@ public class TaskList implements Parcelable {
     String name;
     List<Task> tasks;
 
+    int listId = -1;
+
     public TaskList(String name) {
         this.name = name;
         this.tasks = new ArrayList<>();
@@ -26,6 +28,15 @@ public class TaskList implements Parcelable {
     protected TaskList(Parcel in) {
         name = in.readString();
         tasks = in.createTypedArrayList(Task.CREATOR);
+        listId = in.readInt();
+    }
+
+    public void setListId(int listId) {
+        this.listId = listId;
+    }
+
+    public int getListId() {
+        return listId;
     }
 
     public static final Creator<TaskList> CREATOR = new Creator<TaskList>() {
@@ -63,7 +74,8 @@ public class TaskList implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
-        dest.writeTypedList(tasks);
+        dest.writeString(getName());
+        dest.writeTypedList(getTasks());
+        dest.writeInt(getListId());
     }
 }

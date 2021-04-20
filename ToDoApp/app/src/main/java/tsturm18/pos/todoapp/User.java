@@ -24,8 +24,6 @@ public class User implements Parcelable{
         this.password = password;
     }
 
-    //sickinger-solutions.at/notesserver/register.php
-
     protected User(Parcel in) {
         username = in.readString();
         password = in.readString();
@@ -57,7 +55,6 @@ public class User implements Parcelable{
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.inputStream));
             JsonObject json = new JsonParser().parse(bufferedReader.readLine()).getAsJsonObject();
             response.close();
-            System.out.println(json.toString());
             return !json.get("message").getAsString().equals("username or password not found");
         } catch (IOException e) {
             e.printStackTrace();

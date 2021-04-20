@@ -1,6 +1,7 @@
 package tsturm18.pos.todoapp.task;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +15,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import tsturm18.pos.todoapp.CloudManager;
+import tsturm18.pos.todoapp.InternetConnection;
 import tsturm18.pos.todoapp.R;
+import tsturm18.pos.todoapp.taskList.TaskList;
 
 public class TaskAdapter extends BaseAdapter implements Filterable {
 
@@ -26,16 +30,22 @@ public class TaskAdapter extends BaseAdapter implements Filterable {
 
     private boolean isFiltered;
 
-    public TaskAdapter(Context context, int listViewItemLayoutId, List<Task> tasks, List<Task> finishedTasks) {
+    CloudManager cloudManager;
+    TaskList taskList;
+
+    InternetConnection internetConnection = new InternetConnection();
+
+    public TaskAdapter(Context context, int listViewItemLayoutId, List<Task> tasks, List<Task> finishedTasks, CloudManager cloudManager, TaskList taskList) {
         this.listViewItemLayoutId = listViewItemLayoutId;
 
         this.tasks = tasks;
         this.finishedTasks = finishedTasks;
 
+        this.cloudManager = cloudManager;
+        this.taskList = taskList;
+
         this.context = context;
         inflater =(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-
     }
 
     @Override
@@ -80,8 +90,14 @@ public class TaskAdapter extends BaseAdapter implements Filterable {
             public void onClick(View v) {
                 if(tasks.get(position).isDone()){
                     tasks.get(position).setDone(false);
+                    if (cloudManager.getUser().validUsername() && internetConnection.isNetworkAvailable((Activity) context)){
+                        cloudManager.editTask(taskList,tasks.get(position));
+                    }
                 }else{
                     tasks.get(position).setDone(true);
+                    if (cloudManager.getUser().validUsername() && internetConnection.isNetworkAvailable((Activity) context)){
+                        cloudManager.editTask(taskList,tasks.get(position));
+                    }
                     if (isFiltered){
                         finishedTasks.add(tasks.remove(position));
                         notifyDataSetChanged();
