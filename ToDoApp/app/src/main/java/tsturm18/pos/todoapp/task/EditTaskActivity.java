@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import tsturm18.pos.todoapp.Picker;
 import tsturm18.pos.todoapp.R;
@@ -55,15 +56,20 @@ public class EditTaskActivity extends AppCompatActivity {
     }
 
     public void changeEdit(View view){
+        if (title.getText().toString().isEmpty() || detail.getText().toString().isEmpty()){
+            Toast.makeText(this,"Title and details cannot be empty",Toast.LENGTH_LONG).show();
+        }else {
+            Task task = new Task(title.getText().toString(),editDate.getText().toString() + " " + editTime.getText().toString(),detail.getText().toString(),originalTask.isDone());
+            task.setTaskId(originalTask.getTaskId());
+            task.setLocation(originalTask.getLocation());
+            task.setIsOver();
+            Intent intent =new Intent();
+            intent.putExtra("changedTask", task);
 
-        Task task = new Task(title.getText().toString(),editDate.getText().toString() + " " + editTime.getText().toString(),detail.getText().toString(),originalTask.isDone());
-        task.setTaskId(originalTask.getTaskId());
-        Intent intent =new Intent();
-        intent.putExtra("changedTask", task);
+            setResult(RESULT_OK,intent);
 
-        setResult(RESULT_OK,intent);
-
-        finish();
+            finish();
+        }
     }
 
 }

@@ -44,6 +44,7 @@ import tsturm18.pos.todoapp.LogIn_SignUp;
 import tsturm18.pos.todoapp.R;
 import tsturm18.pos.todoapp.SettingActivity;
 import tsturm18.pos.todoapp.User;
+import tsturm18.pos.todoapp.task.Task;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -136,12 +137,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             if (currentUser.validUsername() && internetConnection.isNetworkAvailable(this)){
                 taskList.clear();
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        taskList.addAll(cloudManager.loadFromCloud());
-                    }
-                });
+                Thread thread = new Thread(() -> taskList.addAll(cloudManager.loadFromCloud()));
                 thread.start();
                 thread.join();
             }else {
@@ -258,6 +254,9 @@ public class MainActivity extends AppCompatActivity {
     public void deleteItem(int position){
         TaskList list = taskList.remove(position);
         if (currentUser.validUsername() && internetConnection.isNetworkAvailable(this)){
+            for (Task task:list.getTasks()) {
+                cloudManager.deleteTask(task);
+            }
             cloudManager.deleteList(list);
         }
         taskListView.invalidateViews();
@@ -266,10 +265,15 @@ public class MainActivity extends AppCompatActivity {
         undoBar.setAction("Undo", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                taskList.add(list);
                 if (currentUser.validUsername() && internetConnection.isNetworkAvailable(MainActivity.this)){
                     cloudManager.addList(list);
+                    list.setListId(cloudManager.getLastChangedList().getListId());
+                    for (Task task:list.getTasks()) {
+                        cloudManager.addTask(list,task);
+                        task.setTaskId(cloudManager.getLastChangedTask().getTaskId());
+                    }
                 }
+                taskList.add(list);
                 taskListView.invalidateViews();
             }
         });
@@ -291,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
                 TaskList list = data.getParcelableExtra("addedList");
                 if (currentUser.validUsername() && internetConnection.isNetworkAvailable(this)){
                     cloudManager.addList(list);
-                    list = cloudManager.getLastChangedList();
+                    list.setListId(cloudManager.getLastChangedList().getListId());
                 }
                 taskList.add(list);
             }

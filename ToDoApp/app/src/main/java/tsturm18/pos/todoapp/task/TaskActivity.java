@@ -4,14 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.nfc.Tag;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,19 +20,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,10 +58,6 @@ public class TaskActivity extends AppCompatActivity {
     User currentUser;
     CloudManager cloudManager;
 
-    LocationManager locationManager;
-    LocationListener locationListener;
-
-    private boolean allowLocation = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +67,6 @@ public class TaskActivity extends AppCompatActivity {
         Intent intent = getIntent();
         taskList = intent.getParcelableExtra("tasks");
 
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         TextView textView = findViewById(R.id.listName);
         textView.setText(taskList.getName());
@@ -102,7 +83,7 @@ public class TaskActivity extends AppCompatActivity {
         if (pref.getBoolean("firstTime", true)) {
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (!isGranted) {
-                    Toast.makeText(this, "You can change this in your settings", Toast.LENGTH_LONG);
+                    Toast.makeText(this, "You can change this in your settings", Toast.LENGTH_LONG).show();
                 }
             }).launch(Manifest.permission.ACCESS_FINE_LOCATION);
             pref.edit().putBoolean("firstTime", false).apply();
@@ -255,45 +236,6 @@ public class TaskActivity extends AppCompatActivity {
         if (requestCode == ADD_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Task task = data.getParcelableExtra("addedTask");
-                locationListener = new LocationListener() {
-                    @Override
-                    public void onLocationChanged(Location location) {
-
-                    }
-
-                    @Override
-                    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                    }
-
-                    @Override
-                    public void onProviderEnabled(String provider) {
-
-                    }
-
-                    @Override
-                    public void onProviderDisabled(String provider) {
-
-                    }
-                };
-                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,3000,0,locationListener);
-                }
-                final String[] location = {""};
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        location[0] = getLocation();
-                    }
-                });
-                thread.start();
-                try {
-                    thread.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                task.setLocation(location[0]);
-                task.setIsOver();
                 if (currentUser.validUsername() && new InternetConnection().isNetworkAvailable(this)) {
                     cloudManager.addTask(taskList, task);
                     task = cloudManager.getLastChangedTask();
@@ -303,7 +245,6 @@ public class TaskActivity extends AppCompatActivity {
         } else if (requestCode == Edit_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Task task = data.getParcelableExtra(("changedTask"));
-                task.setIsOver();
                 if (currentUser.validUsername() && new InternetConnection().isNetworkAvailable(this)) {
                     cloudManager.editTask(taskList, task);
                 }
@@ -324,57 +265,5 @@ public class TaskActivity extends AppCompatActivity {
         intent.putExtra("tasks", taskList);
 
         setResult(RESULT_OK, intent);
-    }
-
-    public String getLocation() {
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        criteria.setCostAllowed(false);
-
-        String provider = locationManager.getBestProvider(criteria, false);
-
-        for (String string:locationManager.getAllProviders()) {
-            System.out.println(string);
-        }
-
-        Location location = null;
-
-        String longitude = "";
-        String latitude = "";
-        String address = "";
-
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-            try {
-                location = locationManager.getLastKnownLocation(provider);
-                if (location!=null) {
-                    longitude = String.valueOf(location.getLongitude());
-                    latitude = String.valueOf(location.getLatitude());
-
-                    InternetConnection internetConnection = new InternetConnection();
-                    InternetConnection.Response response = internetConnection.get("https://eu1.locationiq.com/v1/reverse.php?key=pk.7684f487d4c793c6cdfd80b9348f60bd&lat="+latitude+"&lon="+longitude+"&format=json");
-
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.getInputStream()));
-                    JsonObject json = new JsonParser().parse(bufferedReader.readLine()).getAsJsonObject();
-
-                    JsonObject addressJson = json.getAsJsonObject("address");
-
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append(addressJson.get("country").getAsString() + " ");
-                    stringBuilder.append(addressJson.get("state").getAsString() + " ");
-                    stringBuilder.append(addressJson.get("postcode").getAsString() + " ");
-                    stringBuilder.append(addressJson.get("village").getAsString() + " ");
-                    stringBuilder.append(addressJson.get("road").getAsString() + " ");
-                    stringBuilder.append(addressJson.get("house_number").getAsString());
-                    address = stringBuilder.toString();
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        if (longitude.equals("") || latitude.equals("") || address.equals("")){
-            return "";
-        }
-        return address + " Coordinates: Longitude =" + longitude + " Latitude = " + latitude;
     }
 }

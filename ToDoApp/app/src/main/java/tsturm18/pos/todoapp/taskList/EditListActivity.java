@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -33,13 +34,18 @@ public class EditListActivity extends AppCompatActivity {
     }
 
     public void changeEdit(View view){
-        TaskList taskList = new TaskList(title.getText().toString(),originalTaskList.getTasks());
-        taskList.setListId(originalTaskList.getListId());
-        Intent intent =new Intent();
-        intent.putExtra("changedTaskList", taskList);
+        if (title.getText().toString().isEmpty()){
+            Toast.makeText(this,"Title cannot be empty",Toast.LENGTH_LONG).show();
+        }else {
+            TaskList taskList = new TaskList(title.getText().toString(),originalTaskList.getTasks());
+            taskList.setListId(originalTaskList.getListId());
+            Intent intent =new Intent();
+            intent.putExtra("changedTaskList", taskList);
 
-        setResult(RESULT_OK,intent);
-        finish();
+            setResult(RESULT_OK,intent);
+            finish();
+        }
+
     }
 
 

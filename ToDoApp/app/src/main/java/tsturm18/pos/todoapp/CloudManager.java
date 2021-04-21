@@ -155,7 +155,7 @@ public class CloudManager {
             }else {
                 jsonObject.put("state","OPEN");
             }
-            jsonObject.put("additionalData",task.getLocation() + " ");
+            jsonObject.put("additionalData",task.getLocation());
 
             InternetConnection.Response response = internetConnection.post("http://sickinger-solutions.at/notesserver/todo.php?username="+ user.getUsername() +"&password=" + user.getPassword(),jsonObject.toString());
             boolean success = response.startWith(2);

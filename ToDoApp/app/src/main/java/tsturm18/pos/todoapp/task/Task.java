@@ -1,6 +1,5 @@
 package tsturm18.pos.todoapp.task;
 
-import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -19,7 +18,7 @@ public class Task implements Parcelable {
 
     int taskId = -1;
 
-    String location = "";
+    public String location = "";
 
     public Task(String title, String dateTime, String details, boolean isDone) {
         this.title = title;
@@ -44,6 +43,7 @@ public class Task implements Parcelable {
         isDone = in.readByte() != 0;
         taskId = in.readInt();
         location = in.readString();
+        setIsOver();
     }
 
     public static final Creator<Task> CREATOR = new Creator<Task>() {
