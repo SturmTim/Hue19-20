@@ -2,6 +2,11 @@ package tsturm18.pos.todoapp.task;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,6 +25,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -67,7 +74,6 @@ public class TaskActivity extends AppCompatActivity {
         Intent intent = getIntent();
         taskList = intent.getParcelableExtra("tasks");
 
-
         TextView textView = findViewById(R.id.listName);
         textView.setText(taskList.getName());
 
@@ -103,8 +109,23 @@ public class TaskActivity extends AppCompatActivity {
         show(pref.getBoolean("hideDone", false));
         darkMode(pref.getBoolean("darkActivate", false));
 
-
         registerForContextMenu(taskView);
+
+        System.out.println("Teadasdas");
+
+        /*if (savedInstanceState == null) {
+            Bundle extras = getIntent().getExtras();
+            if(extras == null)
+            {
+
+            }
+            else if (extras.getBoolean("NotiClick"))
+            {
+                System.out.println("test");
+                editItem(extras.getInt("position"));
+            }
+
+        }*/
     }
 
     @Override
@@ -241,6 +262,26 @@ public class TaskActivity extends AppCompatActivity {
                     task = cloudManager.getLastChangedTask();
                 }
                 fullTaskList.add(task);
+
+                /*Intent intent = new Intent(this, TaskActivity.class);
+                intent.putExtra("NotiClick",true);
+                TaskList taskList = new TaskList(this.taskList.getName(),fullTaskList);
+                taskList.setListId(this.taskList.getListId());
+                intent.putExtra("tasks",taskList);
+                intent.putExtra("position",fullTaskList.indexOf(task));
+
+                PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, Intent.FILL_IN_ACTION);
+
+                Notification.Builder builder = new Notification.Builder(this,"TODO")
+                        .setContentTitle("YourTitle")
+                        .setContentText("YourDescription")
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentIntent(pIntent)
+                        .setAutoCancel(true);
+                NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                notificationManager.notify(task.getTaskId(), builder.build());*/
+
+
             }
         } else if (requestCode == Edit_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
@@ -253,6 +294,11 @@ public class TaskActivity extends AppCompatActivity {
         }
         returnResult();
         taskView.invalidateViews();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
     }
 
     public void returnResult() {

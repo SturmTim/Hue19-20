@@ -66,10 +66,10 @@ public class LogIn_SignUp extends AppCompatActivity {
             Intent intent = new Intent();
             intent.putExtra("user",user);
             setResult(RESULT_OK,intent);
+            finish();
         }else{
             Toast.makeText(this, "Incorrect username or password", Toast.LENGTH_SHORT).show();
         }
-        finish();
     }
 
     public void signUp(View view){

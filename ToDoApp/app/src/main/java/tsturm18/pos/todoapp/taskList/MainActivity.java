@@ -1,9 +1,13 @@
 package tsturm18.pos.todoapp.taskList;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -35,6 +39,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,15 +75,26 @@ public class MainActivity extends AppCompatActivity {
     CloudManager cloudManager;
     InternetConnection internetConnection = new InternetConnection();
 
+    public String CHANNEL_ID = "TODO";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String name = "TasksToDo";
+            String description = "Description";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         taskListView = findViewById(R.id.taskList);
 
         listAdapter = new ListAdapter(this,R.layout.list_layout, taskList);
@@ -93,6 +111,14 @@ public class MainActivity extends AppCompatActivity {
         darkMode(pref.getBoolean("darkActivate",false));
 
         registerForContextMenu(taskListView);
+
+        Notification.Builder builder = new Notification.Builder(this,CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("Task to do today:")
+                .setContentText(getTaskToday() + "")
+                .setAutoCancel(true);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(1, builder.build());
     }
 
     @Override
@@ -130,6 +156,20 @@ public class MainActivity extends AppCompatActivity {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    private int getTaskToday(){
+        int count = 0;
+        for (TaskList tasklist:taskList) {
+            for (Task task:tasklist.getTasks()) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+                LocalDate ldtDue = LocalDateTime.parse(task.getDateTime(), formatter).toLocalDate();
+                if ((ldtDue.isBefore(LocalDate.now()) || ldtDue.isEqual(LocalDate.now())) && !task.isDone()) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
     private void loadNotes(){

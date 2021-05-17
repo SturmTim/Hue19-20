@@ -148,7 +148,7 @@ public class AddTaskActivity extends AppCompatActivity {
                     address = addressJson.get("country").getAsString() + " " +
                             addressJson.get("state").getAsString() + " " +
                             addressJson.get("postcode").getAsString() + " " +
-                            addressJson.get("village").getAsString() + " " +
+                            //addressJson.get("village").getAsString() + " " +
                             addressJson.get("road").getAsString() + " " +
                             addressJson.get("house_number").getAsString();
                 }
