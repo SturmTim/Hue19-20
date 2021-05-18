@@ -17,6 +17,7 @@
         android:theme="@style/Theme.ToDoApp"
         android:usesCleartextTraffic="true">
         <activity android:name=".LogIn_SignUp"></activity>
+        <service android:name=".NotificationService" />
         <activity android:name=".task.TaskActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".taskList.MainActivity"/>

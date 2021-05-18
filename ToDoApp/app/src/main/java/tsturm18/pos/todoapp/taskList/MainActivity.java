@@ -48,6 +48,7 @@ import java.util.List;
 import tsturm18.pos.todoapp.CloudManager;
 import tsturm18.pos.todoapp.InternetConnection;
 import tsturm18.pos.todoapp.LogIn_SignUp;
+import tsturm18.pos.todoapp.NotificationService;
 import tsturm18.pos.todoapp.R;
 import tsturm18.pos.todoapp.SettingActivity;
 import tsturm18.pos.todoapp.User;
@@ -119,6 +120,12 @@ public class MainActivity extends AppCompatActivity {
                 .setAutoCancel(true);
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.notify(1, builder.build());
+
+        Intent intent = new Intent(this, NotificationService.class);
+        String msg = "Service started from MainActivity";
+        intent.putExtra("msg", msg);
+        startService(intent);
+
     }
 
     @Override
@@ -137,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         saveNotes();
+
     }
 
     public void saveNotes(){
