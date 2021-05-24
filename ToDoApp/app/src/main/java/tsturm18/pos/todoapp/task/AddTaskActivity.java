@@ -148,7 +148,7 @@ public class AddTaskActivity extends AppCompatActivity {
                     address = addressJson.get("country").getAsString() + " " +
                             addressJson.get("state").getAsString() + " " +
                             addressJson.get("postcode").getAsString() + " " +
-                            //addressJson.get("village").getAsString() + " " +
+                            addressJson.get("village").getAsString() + " " +
                             addressJson.get("road").getAsString() + " " +
                             addressJson.get("house_number").getAsString();
                 }
@@ -160,7 +160,7 @@ public class AddTaskActivity extends AppCompatActivity {
         if (longitude.equals("") || latitude.equals("") || address.equals("")){
             return "No valid Location";
         }
-        return address + " Coordinates: Longitude =" + longitude + " Latitude = " + latitude;
+        return address + " Longitude = " + longitude + " Latitude = " + latitude;
     }
 
 

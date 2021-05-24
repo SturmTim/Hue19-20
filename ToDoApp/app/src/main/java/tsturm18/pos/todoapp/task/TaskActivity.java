@@ -111,8 +111,6 @@ public class TaskActivity extends AppCompatActivity {
 
         registerForContextMenu(taskView);
 
-        System.out.println("Teadasdas");
-
         /*if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null)
